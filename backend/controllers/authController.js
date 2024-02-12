@@ -1,4 +1,5 @@
 const { User } = require("../models/user");
+const { Account } = require("../models/account");
 const { signToken } = require("../utils/helpers/jwt");
 const bcrypt = require("bcrypt");
 
@@ -6,6 +7,13 @@ const signUp = async (req, res) => {
   try {
     const user = new User(req.body);
     const savedUser = await user.save();
+    const money = (Math.random() * 10000 + 1).toFixed(2);
+    const amount = new Account({
+      userId: savedUser.id,
+      balance: money,
+    });
+    await amount.save();
+
     const token = signToken({ userId: savedUser._id });
 
     return res.status(200).json({ msg: "SUCCESS", token: token });
@@ -99,13 +107,20 @@ const updateUser = async (req, res) => {
     return res.status(500).json({ msg: "Internal Server Error" });
   }
 };
+
 const getAllUsers = async (req, res) => {
   try {
+    const userId = req.userId;
     const filter = req.query.filter || "";
     const filteredUsers = await User.find({
-      $or: [
-        { firstName: { $regex: filter, $options: "i" } },
-        { lastName: { $regex: filter, $options: "i" } },
+      $and: [
+        {
+          $or: [
+            { firstName: { $regex: filter, $options: "i" } },
+            { lastName: { $regex: filter, $options: "i" } },
+          ],
+        },
+        { _id: { $ne: userId } },
       ],
     });
 

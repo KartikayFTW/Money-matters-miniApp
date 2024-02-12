@@ -22,6 +22,6 @@ router.put(
   validateRequest(updateUserSchema),
   updateUser
 );
-router.get("/bulk_Users", authMiddleware, getAllUsers);
+router.get("/bulk_users", authMiddleware, getAllUsers);
 
 module.exports = router;
