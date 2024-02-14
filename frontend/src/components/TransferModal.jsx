@@ -1,9 +1,22 @@
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
+
+import useHome from "../hooks/useHome.js/index.js";
 import React from "react";
 
-const Modal = ({ isOpen, onClose,activeUserId }) => {
-    console.log("activeUserId",activeUserId)
+const TransferModal = ({ isOpen, onClose, activeUserId }) => {
+  console.log("activeUserId", activeUserId);
+  const { register, handleSubmit, mutateAsync } = useHome();
+
+  const confirmTransfer = async (data) => {
+    console.log("ddd", data);
+    await mutateAsync({
+      to: activeUserId,
+      amount: data.amount,
+    });
+    onClose();
+  };
+
   return (
     <Transition
       show={isOpen}
@@ -40,11 +53,13 @@ const Modal = ({ isOpen, onClose,activeUserId }) => {
                 placeholder="Enter Amount"
                 type="text"
                 className="h-10 w-full focus:outline-none px-4 text-sm rounded-md border border-black shadow-xl text-gray-700 "
+                {...register("amount")}
               />
+
               <div className="flex gap-10 mb-10">
                 <button
                   className="bg-[#122140] p-2 rounded-lg text-white "
-                  onClick={() => openModalForUser(user.id)}
+                  onClick={handleSubmit(confirmTransfer)}
                 >
                   <span className="text-sm sm:text-lg  font-semibold font-poppins">
                     Confirm
@@ -67,4 +82,4 @@ const Modal = ({ isOpen, onClose,activeUserId }) => {
   );
 };
 
-export default Modal;
+export default TransferModal;
