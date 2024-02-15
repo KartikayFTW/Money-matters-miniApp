@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { transferBalance } from "./transferAmountApi";
+
 import toast from "react-hot-toast";
+import { TransferAmountApi } from "./transferAmountApi";
 
 export const useTransferAmountMutation = () => {
   const queryClient = useQueryClient();
   const transferMutation = useMutation({
-    mutationFn: transferBalance,
+    mutationFn: TransferAmountApi,
     onSuccess: (data) => {
       queryClient.invalidateQueries(["balance"]);
       toast.success(data.msg);

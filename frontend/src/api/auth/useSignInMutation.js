@@ -1,13 +1,14 @@
 import { useMutation } from "@tanstack/react-query";
 
 import { useAuth } from "../../context/authContext";
-import { signIn } from "./SignInApi";
+
 import toast from "react-hot-toast";
+import { SignInApi } from "./SignInApi";
 
 export const useSignInMutation = () => {
   const { login } = useAuth();
   const mutation = useMutation({
-    mutationFn: signIn,
+    mutationFn: SignInApi,
     onSuccess: (data) => {
       toast.success(data.msg);
 
