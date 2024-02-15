@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSignUpMutation } from "../../api/auth/useSignUpMutation";
 import { useNavigate } from "react-router-dom";
 import { useSignInMutation } from "../../api/auth/useSignInMutation";
 
@@ -33,7 +32,6 @@ const useSignIn = () => {
   const onSubmit = async (data) => {
     try {
       const result = await mutateAsync(data);
-      console.log("Sign in result:", result);
 
       localStorage.setItem("token", result.token);
 
