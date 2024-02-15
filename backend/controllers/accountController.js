@@ -27,23 +27,22 @@ const transferBalance = async (req, res) => {
     const account = await Account.findOne({ userId: req.userId }).session(
       session
     );
-    console.log("accc", account);
 
     if (!account || account.balance < amount) {
-      // Abort transaction if balance is insufficient
       await session.abortTransaction();
       session.endSession();
-      return res.status(400).json({ message: "Insufficient balance" });
+      return res.status(400).json({ msg: "Insufficient funds." });
     }
 
     const toAccount = await Account.findOne({ userId: to }).session(session);
-    console.log("toAccount", toAccount);
+
     if (!toAccount) {
-      // Abort transaction if recipient account is invalid
       await session.abortTransaction();
       session.endSession();
-      return res.status(400).json({ message: "Invalid account" });
+      return res.status(404).json({ msg: "Recipient not found." });
     }
+
+    const receiveUser = await User.findOne({ _id: to });
 
     // Deduct from sender
     await Account.updateOne(
@@ -60,14 +59,18 @@ const transferBalance = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.json({ message: "Transfer successful" });
+    res.status(200).json({
+      msg:
+        `Transfer successful to ${receiveUser?.firstName || "the recipient"} ${
+          receiveUser?.lastName || ""
+        }`.trim() + `!`,
+    });
   } catch (error) {
     console.log(error);
     await session.abortTransaction();
     session.endSession();
-    return res.status(500).json({
-      error: "INTERNAL_SERVER_ERROR",
-      msg: "An error occurred while transferring.",
+    res.status(500).json({
+      msg: "Transfer failed. Try again.",
     });
   }
 };

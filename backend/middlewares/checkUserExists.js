@@ -7,7 +7,7 @@ const checkUserExists = async (req, res, next) => {
     if (existingUser) {
       return res.status(409).json({ 
         error: "EMAIL_ALREADY_EXISTS",
-        msg: "A user with this email already exists.",
+        msg: "Email in use. Try another.",
       });
     }
     next();

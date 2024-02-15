@@ -16,12 +16,13 @@ const signUp = async (req, res) => {
 
     const token = signToken({ userId: savedUser._id });
 
-    return res.status(200).json({ msg: "SUCCESS", token: token });
+    return res.status(200).json({ msg: "Account created!", token: token });
   } catch (err) {
     console.error("Signup Error:", err);
-    return res
-      .status(500)
-      .json({ error: "INTERNAL_ERROR", msg: "Internal Server Error" });
+    return res.status(500).json({
+      error: "INTERNAL_SERVER_ERROR",
+      msg: "Signup failed. Try again.",
+    });
   }
 };
 
@@ -30,9 +31,9 @@ const signIn = async (req, res) => {
     const { email, password } = req.body;
     const existingUser = await User.findOne({ email: email });
     if (!existingUser) {
-      return res.status(404).json({
-        error: "EMAIL_DOES_NOT_EXIST",
-        msg: "This email does not exist.",
+      return res.status(409).json({
+        error: "EMAIL_NOT_FOUND",
+        msg: "Email not registered.",
       });
     } else {
       const match = await bcrypt.compare(password, existingUser.password);
@@ -46,18 +47,19 @@ const signIn = async (req, res) => {
         console.log("Authentication failed. Incorrect password.");
         return res
           .status(401)
-          .json({ error: "WRONG_PASSWORD", msg: "Incorrect password." });
+          .json({ error: "INCORRECT_PASSWORD", msg: "Wrong password." });
       }
     }
   } catch (err) {
     console.error("SignIn Error:", err);
-    return res.status(500).json({ msg: "Internal Server Error" });
+    return res.status(500).json({ msg: "Login error. Try again later." });
   }
 };
 
 const updateUser = async (req, res) => {
   try {
     const { password, firstName, lastName } = req.body;
+    console.log("oo", firstName, lastName);
     const userId = req.userId;
 
     // Find the current user
@@ -78,6 +80,7 @@ const updateUser = async (req, res) => {
       updateObject.lastName = lastName;
       changesMade = true;
     }
+
     if (password) {
       const isMatch = await bcrypt.compare(password, currentUser.password);
       if (isMatch) {
@@ -105,6 +108,31 @@ const updateUser = async (req, res) => {
   } catch (err) {
     console.error("Update Error:", err);
     return res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
+
+const getUserDetails = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const userDetails = await User.find({
+      _id: req.userId,
+    });
+
+    if (userDetails.length === 0) {
+      return res.status(404).json({
+        msg: "User details not found.",
+        users: [],
+      });
+    }
+
+    return res
+      .status(200)
+      .json({ msg: "Users fetched successfully", userDetails });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      msg: "Failed to fetch user details. Please try again.",
+    });
   }
 };
 
@@ -152,4 +180,5 @@ module.exports = {
   signIn,
   updateUser,
   getAllUsers,
+  getUserDetails,
 };

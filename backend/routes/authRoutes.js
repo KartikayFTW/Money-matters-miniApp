@@ -6,6 +6,7 @@ const {
   signIn,
   updateUser,
   getAllUsers,
+  getUserDetails,
 } = require("../controllers/authController");
 const validateRequest = require("../middlewares/validateRequest");
 const checkUserExists = require("../middlewares/checkUserExists");
@@ -22,6 +23,7 @@ router.put(
   validateRequest(updateUserSchema),
   updateUser
 );
+router.get("/user_details", authMiddleware, getUserDetails);
 router.get("/bulk_users", authMiddleware, getAllUsers);
 
 module.exports = router;
