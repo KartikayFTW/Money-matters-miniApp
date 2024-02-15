@@ -1,93 +1,142 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import useUserDetails from "../../hooks/useUserDetails";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useUpdateUserMutation } from "../../api/auth/useUpdateUserMutation";
+import useProfile from "../../hooks/useProfile";
 
 const Profile = () => {
-  
-  const [isEditing, setIsEditing] = useState(false);
-  const [user, setUser] = useState({
-    name: "John",
-    email: "John@gmail.com",
-  });
-
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUser((prevUser) => ({
-      ...prevUser,
-      [name]: value,
-    }));
-  };
-
-
-  const handleUpdate = () => {
-    setIsEditing(false);
-
-  };
-
-
-  const handleCancel = () => {
-    setIsEditing(false);
-   
-  };
+  const {
+    updateUserDetailsHandler,
+    isFormValid,
+    register,
+    isEditing,
+    setIsEditing,
+    firstName,
+    lastName,
+    onCancelHandler,
+    userData,
+    email,
+    handleSubmit,
+    errors,
+  } = useProfile();
 
   return (
-    <div className="flex w-screen h-[90vh] items-center justify-center overflow-hidden">
+    <div className="flex w-screen h-[90vh]  items-center justify-center overflow-hidden">
       <div className="flex flex-col h-auto w-[30rem] items-center bg-gray-300 p-4 rounded-lg shadow-lg space-y-4">
-        <h2 className="text-2xl font-semibold">Personal Details</h2>
-        {isEditing ? (
-          <>
-            <div className="flex flex-col w-full px-4">
-              <label htmlFor="name" className="text-lg font-medium">Name:</label>
+        <h2 className="text-2xl font-semibold sm:text-center text-left w-full font-poppins">
+          Personal Details
+        </h2>
+        {isEditing && userData ? (
+          <form className=" w-full flex flex-col justify-center items-center">
+            <div className="flex flex-col gap-2 h-20 sm:w-1/2 w-full">
+              <label
+                htmlFor="firstName"
+                className="text-sm font-semibold font-poppins"
+              >
+                First name
+              </label>
               <input
-                id="name"
+                id="firstName"
                 type="text"
-                name="name"
-                value={user.name}
-                onChange={handleInputChange}
-                className="mb-4 px-3 py-2 rounded-md border-2 border-gray-300"
-                placeholder="Name"
+                {...register("firstName")}
+                className={`h-8 focus:outline-none px-4 text-sm rounded-md border border-black shadow-xl text-gray-700 font-poppins ${
+                  errors.firstName ? "border-1 border-red-500" : ""
+                }`}
               />
+              {errors.firstName && (
+                <p className="text-red-500 text-xs font-quickSand h-1">
+                  {errors?.firstName?.message}
+                </p>
+              )}
             </div>
-            <div className="flex flex-col w-full px-4">
-              <label htmlFor="email" className="text-lg font-medium">Email:</label>
+            <div className="flex flex-col gap-2 h-20 sm:w-1/2 w-full">
+              <label
+                htmlFor="lastName"
+                className="text-sm font-semibold font-poppins"
+              >
+                Last name
+              </label>
               <input
-                id="email"
-                type="email"
-                name="email"
-                value={user.email}
-                onChange={handleInputChange}
-                className="mb-4 px-3 py-2 rounded-md border-2 border-gray-300"
-                placeholder="Email"
+                id="lastName"
+                type="text"
+                {...register("lastName")}
+                className={`h-8 focus:outline-none px-4 text-sm rounded-md border border-black shadow-xl text-gray-700 font-poppins ${
+                  errors.lastName ? "border-1 border-red-500" : ""
+                }`}
               />
+              {errors.lastName && (
+                <p className="text-red-500 text-xs font-quickSand h-1">
+                  {errors.lastName.message}
+                </p>
+              )}
             </div>
-          </>
+            <div className="flex flex-col gap-2 h-20 sm:w-1/2 w-full">
+              <label
+                htmlFor="password"
+                className="text-sm font-semibold font-poppins"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                placeholder="*********"
+                type="password"
+                {...register("password")}
+                className={`h-8 focus:outline-none px-4 text-sm rounded-md border border-black shadow-xl text-gray-700 font-poppins ${
+                  errors.password ? "border-1 border-red-500" : ""
+                }`}
+              />
+              {errors.password && (
+                <p className="text-red-500 text-xs font-quickSand h-1">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            <div className="flex space-x-4 mt-8">
+              <button
+                disabled={!isFormValid}
+                onClick={handleSubmit(updateUserDetailsHandler)}
+                className={`text-white font-bold py-2 px-4 rounded font-poppins ${
+                  isFormValid
+                    ? "bg-blue-500 hover:bg-blue-700"
+                    : "bg-gray-500 cursor-not-allowed"
+                }`}
+              >
+                Update
+              </button>
+              <button
+                onClick={onCancelHandler}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded font-poppins"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         ) : (
           <>
-            <p><span className="font-medium">Name:</span> {user.name}</p>
-            <p><span className="font-medium">Email:</span> {user.email}</p>
+            <div className=" flex flex-col gap-2 ">
+              <div className="flex gap-2">
+                <span className="font-bold font-poppins">Name:</span>{" "}
+                <span className="font-poppins">
+                  {firstName}
+                  <span className="font-poppins"> {lastName}</span>
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <span className="font-bold font-poppins">Email:</span>{" "}
+                <span>{email}</span>
+              </div>
+            </div>
+            <button
+              onClick={() => setIsEditing(true)}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded font-poppins"
+            >
+              Edit
+            </button>
           </>
-        )}
-        {isEditing ? (
-          <div className="flex space-x-4">
-            <button
-              onClick={handleUpdate}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Update
-            </button>
-            <button
-              onClick={handleCancel}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Edit
-          </button>
         )}
       </div>
     </div>

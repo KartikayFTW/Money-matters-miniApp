@@ -1,15 +1,13 @@
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
-import useHome from "../hooks/useHome.js/index.js";
 import React from "react";
+import useHome from "../hooks/useHome";
 
 const TransferModal = ({ isOpen, onClose, activeUserId }) => {
-  console.log("activeUserId", activeUserId);
   const { register, handleSubmit, mutateAsync } = useHome();
 
   const confirmTransfer = async (data) => {
-    console.log("ddd", data);
     await mutateAsync({
       to: activeUserId,
       amount: data.amount,
@@ -33,10 +31,10 @@ const TransferModal = ({ isOpen, onClose, activeUserId }) => {
         <div className="fixed inset-0 flex w-screen max-w-full items-center justify-center p-4">
           <Dialog.Panel className="mx-auto sm:w-1/2 sm:h-1/2 h-1/2 w-full max-w-full rounded bg-white flex flex-col justify-between gap-5 items-center">
             <div className="flex flex-col gap-2 justify-center items-center">
-              <Dialog.Title className="text-center font-medium text-xl pt-10">
+              <Dialog.Title className="text-center font-medium text-xl pt-10 font-poppins">
                 You are about to send Money
               </Dialog.Title>
-              <Dialog.Description className="">
+              <Dialog.Description className="font-poppins">
                 The Will be send in a flash
               </Dialog.Description>
             </div>
@@ -52,7 +50,7 @@ const TransferModal = ({ isOpen, onClose, activeUserId }) => {
                 id="amount"
                 placeholder="Enter Amount"
                 type="text"
-                className="h-10 w-full focus:outline-none px-4 text-sm rounded-md border border-black shadow-xl text-gray-700 "
+                className="h-10 w-full focus:outline-none px-4 text-sm rounded-md border border-black shadow-xl text-gray-700 font-poppins"
                 {...register("amount")}
               />
 
@@ -66,7 +64,7 @@ const TransferModal = ({ isOpen, onClose, activeUserId }) => {
                   </span>
                 </button>
                 <button
-                  className="bg-[#122140] p-2 rounded-lg text-white "
+                  className="bg-[#122140] p-2 rounded-lg text-white font-poppins"
                   onClick={onClose}
                 >
                   <span className="text-sm sm:text-lg  font-semibold font-poppins">
